@@ -26,7 +26,7 @@ Ensure you have the following installed:
 1. Clone the repository:
    ```sh
    (https://github.com/067prabhat/NITT_M-tech.git)
-   cd NIT-Trichy-Ecampus
+   cd NIT-Trichy
    ```
 2. Install dependencies:
    ```sh
@@ -70,6 +70,6 @@ Feel free to contribute by forking the repository and submitting pull requests.
 This project is licensed under the MIT License.
 
 ## Contact
-For any queries or contributions, contact [your-email@example.com] or open an issue in the repository.
+For any queries or contributions, contact [kumarprabhat3623@gmail.com] or open an issue in the repository.
 
 
