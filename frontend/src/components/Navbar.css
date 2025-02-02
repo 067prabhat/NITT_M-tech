@@ -1,0 +1,132 @@
+/* Navbar.css */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  /* Removed margin-top, let it be naturally aligned at the top */
+  position: fixed; /* Fixed positioning to keep it at the top */
+  top: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure the navbar stays on top of other content */
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-logo img {
+  height: 50px;
+  width: 50px;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin: 0 15px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #ecf0f1;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: #3498db;
+}
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-search input {
+  padding: 5px;
+  border: 1px solid #bdc3c7;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.navbar-search button {
+  padding: 5px 10px;
+  background-color: #3498db;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+.navbar-search button:hover {
+  background-color: #2980b9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    justify-content: space-between;
+    height: auto;
+    padding: 10px;
+  }
+
+  .navbar-logo {
+    font-size: 1.2rem;
+  }
+
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .navbar-links li {
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+
+  .navbar-search {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .navbar-search input {
+    width: 70%;
+    margin-right: 10px;
+  }
+
+  .navbar-search button {
+    width: 20%;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  .navbar-logo {
+    font-size: 1rem;
+  }
+
+  .navbar-search input {
+    width: 60%;
+  }
+
+  .navbar-search button {
+    width: 30%;
+  }
+}
