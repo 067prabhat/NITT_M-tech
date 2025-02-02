@@ -25,7 +25,7 @@ Ensure you have the following installed:
 ### Steps
 1. Clone the repository:
    ```sh
-   [git clone https://github.com/your-repo/NIT-Trichy-Ecampus.git]
+   (https://github.com/067prabhat/NITT_M-tech.git)
    cd NIT-Trichy-Ecampus
    ```
 2. Install dependencies:
