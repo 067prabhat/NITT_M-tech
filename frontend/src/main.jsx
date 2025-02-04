@@ -7,7 +7,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <AuthProvider>
     <Router>
         <App/>
-        <App/>
     </Router>
   </AuthProvider>
 )
