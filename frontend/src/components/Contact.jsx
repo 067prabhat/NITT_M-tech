@@ -10,7 +10,7 @@ const Contact = () => {
           <div className="info-item">
             <h3 className="info-title">Location:</h3>
             <p className="info-detail">
-              National Institute of Technology, Trichy
+              National Institute of Technology, Trich
               <br />
               Tiruchirappalli, Tamil Nadu, India - 620015
             </p>
