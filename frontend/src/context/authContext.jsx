@@ -9,18 +9,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if the user is logged in by checking localStorage for token
-    const userId = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
 
-    if (userId && token) {
-      setCurrentUser(userId);
+    if (token) {
+      // Decode the token to get the user's information (including role)
+      const decodedUser = JSON.parse(atob(token.split(".")[1])); // Decode JWT token
+      setCurrentUser({
+        userId: decodedUser.userId,
+        role: decodedUser.role,  // Store the role along with userId
+      });
     }
   }, []);
 
   const logout = () => {
     // Clear user data from localStorage and update the currentUser state
     localStorage.removeItem("token");
-    localStorage.removeItem("userId");
     setCurrentUser(null);
   };
 

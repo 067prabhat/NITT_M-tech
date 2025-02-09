@@ -6,70 +6,99 @@ import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
-  const { currentUser } = useAuth();  // Get currentUser from context
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Fetch users only if the logged-in user is an admin
-    const fetchUsers = async () => {
+    const fetchUserDetails = async () => {
       try {
-        const res = await axios.get('http://localhost:3001/users');
-        setUsers(res.data);
+        if (currentUser) {
+          console.log("Fetching user details for:", currentUser.userId);
+          const res = await axios.get(`http://localhost:3001/api/users/${currentUser.userId}`, {
+            headers: {
+              "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          console.log("Admin Details:", res.data);
+          setUsers([res.data]); // Store admin details
+        }
       } catch (err) {
-        console.error('Error fetching users:', err);
+        console.error("Error fetching admin details:", err);
+        setError("Failed to load user details.");
+      } finally {
+        setLoading(false);
       }
     };
-
-    // Only fetch users if admin is logged in
-    if (currentUser && localStorage.getItem("role") === "admin") {
-      fetchUsers();
+  
+    if (currentUser) {
+      fetchUserDetails();
+    } else {
+      setError("Please log in first.");
+      setLoading(false);
     }
   }, [currentUser]);
+  
+
+  const handleDeleteUser = async (userId) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/users/${userId}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setUsers(users.filter(user => user._id !== userId));
+      alert("User deleted successfully");
+    } catch (err) {
+      alert("Failed to delete user");
+    }
+  };
+
+  if (loading) return <div className="loading">Loading...</div>;
 
   return (
     <div className="admin-dashboard">
-      <div className="dashboard-header">
-        <h2>Welcome Admin</h2>
-        <p>Manage the platform from here</p>
+      <div className="admin-profile">
+        <h2>Welcome, {currentUser.name}</h2>
+        <p>Email: {currentUser.email}</p>
+        <p>Role: {currentUser.role}</p>
       </div>
 
       <div className="dashboard-content">
-        <div className="user-list">
-          <h3>Registered Users</h3>
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role}</td>
-                    <td>
-                      <Link to={`/user/${user._id}`} className="btn btn-info">View</Link>
-                      <button className="btn btn-danger">Delete</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4">No users found</td>
+        {error && <div className="error-message">{error}</div>}
+        
+        <h3>Registered Users</h3>
+        <table className="user-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Purchased Courses</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length > 0 ? (
+              users.map((user) => (
+                <tr key={user._id}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td>{user.courses ? user.courses.join(", ") : "None"}</td>
+                  <td>
+                    <Link to={`/user/${user._id}`} className="btn btn-info">View</Link>
+                    <button className="btn btn-danger" onClick={() => handleDeleteUser(user._id)}>Delete</button>
+                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="dashboard-actions">
-          <Link to="/add-user" className="btn btn-success">Add New User</Link>
-          <Link to="/settings" className="btn btn-warning">Settings</Link>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5">No users found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

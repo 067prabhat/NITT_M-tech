@@ -12,10 +12,15 @@ const About = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      
     }, 3000); // this function is helping in change of image itself at 3 sec
-
+    
+  
     return () => clearInterval(interval);
   }, [images.length]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="about-container">

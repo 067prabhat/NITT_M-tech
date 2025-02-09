@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const FormDataModel = require("./models/FormData");
 const CourseModel = require("./models/Course");
+const ApplicationForm = require("./models/ApplicationFormSchema");
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use(
   cors({
     origin: "*",
     methods: "GET,POST,PUT,DELETE",
+    credentials: true
   })
 );
 
@@ -24,121 +26,246 @@ mongoose.connect(MONGO_URI, {
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
-// User Registration with Password Hashing & JWT Token
-app.post("/register", async (req, res) => {
-  const { name, email, password, role } = req.body;  // Now receiving role from frontend
+// Middleware for admin authorization
+const authorizeAdmin = (req, res, next) => {
+  console.log("User role:", req.user.role);  // Log the user role for debugging
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied. Admins only." });
+  }
+  next();
+};
 
-  // Default role to "student" if not provided
-  const userRole = role || "student";  // If role is not passed, default to student
+// Middleware to Protect Routes
+const authenticate = (req, res, next) => {
+  const token = req.header("Authorization");
+  if (!token) {
+    console.error("No token provided"); // Log error
+    return res.status(401).json({ message: "Access denied. No token provided." });
+  }
 
   try {
-    // Check if the user already exists
+    const decoded = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
+    console.log("Decoded JWT:", decoded); // Log decoded JWT for debugging
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("Invalid token:", error); // Log error
+    res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+// User Registration with Password Hashing & JWT Token
+app.post("/register", async (req, res) => {
+  const { name, email, password, role } = req.body;
+  const userRole = role || "student"; // Default role to "student" if not provided
+  try {
     const user = await FormDataModel.findOne({ email });
     if (user) {
       return res.status(400).json("Already registered");
     }
 
-    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the new user with hashed password and role
     const newUser = await FormDataModel.create({
       name,
       email,
       password: hashedPassword,
-      role: userRole,  // Store the role in the database
+      role: userRole,
     });
 
-    // Generate JWT token including the user's role
     const token = jwt.sign(
-      { userId: newUser._id, email: newUser.email, role: newUser.role },  // Include role in token payload
-      process.env.JWT_SECRET,  // Assuming the secret is in environment variables
-      { expiresIn: "1h" }  // Set token expiration time
+      { userId: newUser._id, email: newUser.email, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
-    // Send the response with the user ID and token
     res.json({
       userId: newUser._id,
       token: token,
-      role: newUser.role,  // Send the user's role in the response
+      role: newUser.role,
     });
   } catch (error) {
-    console.error(error);
+    console.error(error); // Log error for debugging
     res.status(500).json({ error: "Registration failed" });
   }
 });
 
-
 // User Login with Authentication
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await FormDataModel.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "No user found with this email" });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect password" });
     }
 
-    // Generate JWT Token
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },  // Include role in JWT payload
+      { userId: user._id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    res.json({ token, userId: user._id, role: user.role });  // Send role in response
+    res.json({ token, userId: user._id, role: user.role });
   } catch (error) {
+    console.error("Login error:", error); // Log error for debugging
     res.status(500).json({ message: "Login error", error });
   }
 });
 
+// Route: Admin Adds a Course
+app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
+  const { title, description, duration, fee, details,contact,requirement } = req.body;
+  console.log("Received course data:", req.body); // Debug log
 
-// Middleware to Protect Routes
-const authenticate = (req, res, next) => {
-  const token = req.header("Authorization");
-  if (!token) {
-    return res.status(401).json({ message: "Access denied. No token provided." });
+  // Validate that all required fields are provided
+  if (!title || !description || !duration || !fee) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const decoded = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
-    req.user = decoded; // Store the decoded user info in the request
-    next();
+    const newCourse = new CourseModel({
+      title,
+      description,
+      duration,
+      fee,
+      details, // Add details here as per request
+      contact,
+      requirement,
+    });
+
+    await newCourse.save();
+    res.status(201).json({ message: "Course added successfully", course: newCourse });
   } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
+    console.error("Course creation error:", error); // Log error for debugging
+    res.status(500).json({ message: "Error adding course", error: error.message }); // Detailed error message
   }
-};
+});
 
-
-app.get("/user/:userId", authenticate, async (req, res) => {
-  const { userId } = req.params;
+// Route: Fetch All Users (admin only)
+app.get("/api/users", authenticate, authorizeAdmin, async (req, res) => {
   try {
-    const user = await FormDataModel.findById(userId);
+    const users = await FormDataModel.find(); // Fetch all users from FormDataModel
+    res.json(users); // Return the users
+  } catch (error) {
+    console.error("Error fetching users:", error); // Log error for debugging
+    res.status(500).json({ message: "Error fetching users", error });
+  }
+});
+
+// Route: Fetch All Courses
+app.get("/api/courses", async (req, res) => {
+  try {
+    const courses = await CourseModel.find();
+    res.json(courses);
+  } catch (error) {
+    console.error("Error fetching courses:", error); // Log error for debugging
+    res.status(500).json({ message: "Error fetching courses", error });
+  }
+});
+
+// Route: Fetch a specific user by ID (admin only)
+app.get("/api/users/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+
+  console.log(`Fetching user ${id} - Requested by ${req.user.userId} (Role: ${req.user.role})`);
+
+  try {
+    if (req.user.role === "admin" || req.user.userId === id) {
+      const user = await FormDataModel.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.json(user);
+    }
+
+    return res.status(403).json({ message: "Access denied." });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Error fetching user", error });
+  }
+});
+
+
+
+
+// Route to delete a user (admin only)
+app.delete("/api/users/:id", authenticate, authorizeAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await FormDataModel.findByIdAndDelete(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({
-      name: user.name,
-      email: user.email,
-      courses: user.courses || [] // Assuming 'courses' is an array field in the user model
-    });
+    res.json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching user data" });
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Error deleting user", error });
+  }
+});
+
+// Route: Submit Application Form
+app.post("/api/application", authenticate, async (req, res) => {
+  try {
+    const newApplication = new ApplicationForm(req.body);
+    await newApplication.save();
+    res.status(201).json({ message: "Application submitted successfully!", application: newApplication });
+  } catch (error) {
+    console.error("Error submitting application:", error);
+    res.status(500).json({ message: "Error submitting application", error: error.message });
+  }
+});
+
+// Route: Fetch All Applications (Admin Only)
+app.get("/api/applications", authenticate, authorizeAdmin, async (req, res) => {
+  try {
+    const applications = await ApplicationForm.find();
+    res.json(applications);
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    res.status(500).json({ message: "Error fetching applications", error });
+  }
+});
+
+
+// Route: Fetch a Specific Application by ID
+app.get("/api/application/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const application = await ApplicationForm.findById(id);
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+    res.json(application);
+  } catch (error) {
+    console.error("Error fetching application:", error);
+    res.status(500).json({ message: "Error fetching application", error });
+  }
+});
+
+
+// Route: Delete Application (Admin Only)
+app.delete("/api/application/:id", authenticate, authorizeAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const application = await ApplicationForm.findByIdAndDelete(id);
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+    res.json({ message: "Application deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting application:", error);
+    res.status(500).json({ message: "Error deleting application", error });
   }
 });
 
 
 
-// Example Protected Route
-app.get("/api/protected", authenticate, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
-});
+
 
 // Start Server
 app.listen(3001, () => {

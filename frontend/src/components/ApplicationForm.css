@@ -1,0 +1,532 @@
+/* Container */
+.app-container {
+  padding-top: 100px;
+  display: flex;
+  height: 100vh;
+  background: white;
+  margin-bottom: 200px;
+}
+
+/* Sidebar */
+.sidebar {
+  padding-top: 120px;
+  width: 250px;
+  height: 600px;
+  background: #2c3e50;
+  padding: 20px;
+  color: white;
+  border-right: 3px solid #1abc9c;
+}
+
+.sidebar h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 12px;
+  margin: 5px 0;
+  cursor: pointer;
+  background: #34495e;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.sidebar li:hover {
+  background: #1abc9c;
+}
+
+.sidebar li.active {
+  background: #1abc9c;
+}
+
+/* Form Container */
+.form-container {
+  flex: 1;
+  height: 90vh;
+  padding: 30px;
+  margin-top: 70px; /* Push the form below the header */
+  margin-bottom: 70px; /* Push form above footer */
+}
+
+.form-container h2 {
+  color: #2c3e50;
+  border-bottom: 2px solid #1abc9c;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+/* Button Styling */
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+.complete-btn {
+  margin-top: 10px;
+  padding: 8px 15px;
+  background: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.complete-btn:hover {
+  background: darkgreen;
+}
+
+/* Personal Details Form */
+.personal-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.personal-details label {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.personal-details input,
+.personal-details select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.complete-btn {
+  margin-top: 15px;
+  background: green;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.complete-btn:hover {
+  background: darkgreen;
+}
+
+/* Contact Information Form */
+.contact-information {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-information label {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.contact-information input,
+.contact-information textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.complete-btn {
+  margin-top: 15px;
+  background: green;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.complete-btn:hover {
+  background: darkgreen;
+}
+
+/* Academic Details */
+.academic-details {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.accordion-section {
+  margin-bottom: 10px;
+}
+
+.accordion {
+  background-color: #f9f9f9;
+  color: #333;
+  cursor: pointer;
+  padding: 15px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.accordion:hover {
+  background-color: #f1f1f1;
+}
+
+.panel {
+  padding: 15px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+}
+
+.academic-information {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.academic-information label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.academic-information input,
+.academic-information select,
+.academic-information textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+/* Align labels to the left */
+.personal-details,
+.contact-information,
+.academic-information,
+.parent-details,
+.document-upload,
+.declaration-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.personal-details label,
+.contact-information label,
+.academic-information label,
+.parent-details label,
+.document-upload label,
+.declaration-section label {
+  display: flex;
+  justify-content: flex-start; /* Align label text to the left */
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Ensure form fields take full width */
+.personal-details input,
+.personal-details select,
+.contact-information input,
+.contact-information textarea,
+.academic-information input,
+.academic-information select,
+.academic-information textarea,
+.parent-details input,
+.parent-details textarea,
+.document-upload input,
+.document-upload select,
+.document-upload textarea,
+.declaration-section input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Button Spacing */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.button-container .back-btn {
+  margin-right: 20px; /* Add space between Back and Next buttons */
+}
+
+.academic-information input[type="text"],
+.academic-information input[type="date"] {
+  height: 35px;
+}
+
+.academic-information input[type="tel"],
+.academic-information input[type="email"],
+.academic-information input[type="number"] {
+  height: 35px;
+}
+
+.academic-information select {
+  height: 35px;
+}
+
+.academic-information textarea {
+  height: 80px;
+}
+
+.academic-information .form-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.academic-information .form-btn:hover {
+  background-color: #45a049;
+}
+
+.academic-details .error-message {
+  color: red;
+  font-size: 12px;
+}
+
+.academic-details select,
+.academic-details input {
+  background-color: #f9f9f9;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.academic-details select:focus,
+.academic-details input:focus {
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 255, 0.2);
+}
+
+/* Parent Details Section */
+.parent-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.parent-details label {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.parent-details input,
+.parent-details textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.parent-details input[type="tel"],
+.parent-details input[type="text"],
+.parent-details input[type="email"] {
+  height: 35px;
+}
+
+.parent-details textarea {
+  height: 80px;
+}
+
+.parent-details .form-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.parent-details .form-btn:hover {
+  background-color: #45a049;
+}
+
+/* Styling for Input Focus */
+.parent-details input:focus,
+.parent-details textarea:focus {
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 255, 0.2);
+}
+
+/* Optional Error Message Styling */
+.parent-details .error-message {
+  color: red;
+  font-size: 12px;
+}
+
+/* Document Upload Section */
+.document-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.document-upload label {
+  font-weight: bold;
+  color: #555;
+}
+
+.document-upload input[type="file"],
+.document-upload select,
+.document-upload textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.document-upload input[type="file"] {
+  background-color: #f9f9f9;
+  padding: 10px;
+}
+
+.document-upload select {
+  height: 35px;
+}
+
+.document-upload textarea {
+  height: 80px;
+}
+
+.document-upload .form-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.document-upload .form-btn:hover {
+  background-color: #45a049;
+}
+
+/* Styling for the input on focus */
+.document-upload input[type="file"]:focus,
+.document-upload select:focus,
+.document-upload textarea:focus {
+  border-color: #1abc9c;
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
+}
+
+.document-upload input[type="file"]::file-selector-button {
+  background-color: #1abc9c;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.document-upload input[type="file"]::file-selector-button:hover {
+  background-color: #16a085;
+}
+
+/* Declaration Section */
+.declaration-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 15px;
+}
+
+.declaration-section label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+}
+
+.declaration-section .agreement-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.declaration-section input[type="text"],
+.declaration-section input[type="checkbox"] {
+  margin: 10px 0;
+}
+
+.declaration-section input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.declaration-section .submit-btn {
+  padding: 12px 20px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.declaration-section .submit-btn:hover {
+  background-color: #45a049;
+}
+
+/* Styling for the input on focus */
+.declaration-section input[type="text"]:focus {
+  border-color: #1abc9c;
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
+}
+
+.declaration-section input[type="checkbox"]:checked {
+  background-color: #1abc9c;
+}
+
+/* Checkbox styling */
+.declaration-section input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+

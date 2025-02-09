@@ -5,97 +5,145 @@
 
 .hero-section {
   text-align: center;
-  background: lightblue;
-  color: white;
-  padding: 20px;
+  background: linear-gradient(135deg, #022462, #2a5298); /* Gradient blue background */
+  color: #ffffff;
+  padding: 50px 20px;
+  font-family: "Plus Jakarta Sans", serif !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  font-weight: 300;
+  opacity: 0.9;
+  letter-spacing: 1px;
+}
+
+
 .moving-text-wrapper {
+  height: 30px;
   overflow: hidden;
   white-space: nowrap;
-  background: #f3f3f3;
-  padding: 10px 0;
+  background: #d3dbed;
+  /* padding: 10px 0; */
   position: relative;
 }
 
-.image-slideshow img {
+.image-slideshow img{
   height: 22em;
   width: 50em;
   border-radius: 3%;
 }
 
+
 .moving-text {
   display: inline-block;
-  font-size: 20px;
+  font-size: 12px;
   font-weight: bold;
   color: #000;
-  animation: marquee 20s linear infinite;
-  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+  white-space: nowrap; 
   cursor: pointer;
 }
-
 .moving-text:hover {
   animation-play-state: paused;
 }
 
 .notice-board,
-.student-corner {
-  border: 0.5px solid rgb(200, 197, 197);
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  position: relative;
+.student-corner{
+  border:0.5px , solid , rgb(200, 197, 197);
+  box-shadow:1px 1px 1px rgba(0,0,0,0.5) ;
 }
-
 .notice-list,
 .student-list {
+  position:relative;
   background: rgb(255, 255, 255);
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius:2px ;
   padding: 20px;
   max-height: 200px; /* Limit the height */
-  overflow: hidden; /* Hide overflow */
-  position: relative;
+  overflow: hidden; /* Hide the content that overflows */
 }
 
-/* Hover effect to stop the animation */
-.notice-list:hover,
-.student-list:hover {
+.notice-item, .student-item {
+  text-decoration: none;
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 16px;
+  padding: 10px 0;
+  animation: scrollText 10s linear infinite;
+
+}
+/* .notice-item:hover, .student-item:hover {
+  animation-play-state: paused; /* Pause animation on hover 
+} */
+
+.notice-list:hover .notice-item,
+.student-list:hover .student-item  {
   animation-play-state: paused;
 }
 
-/* Scrolling effect for notice items and student items */
-.notice-item,
-.student-item {
-  text-decoration: none;
-  display: block;
-  font-size: 16px;
-  padding: 10px 0;
-  animation: scrollText 10s linear infinite; /* Adjust duration as needed */
-}
-
-.notice-list,
-.student-list {
-  position: relative;
-}
-
-/* Create infinite loop scroll effect */
 @keyframes scrollText {
   0% {
-    transform: translateY(100%); /* Start from below */
-  }
-  50% {
-    transform: translateY(0); /* Normal position */
+    transform: translateY(100%);
   }
   100% {
-    transform: translateY(-100%); /* Move up completely */
+    transform: translateY(-100%);
   }
 }
+.apply-now-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #d3dbed;
+  /* padding: 10px 0; */
+  position: relative;
+  text-align: center;
+}
 
+.apply-now-text {
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(234, 16, 16);
+  text-decoration: none;
+  animation: marqueeApply 12s linear infinite;
+  white-space: nowrap;
+}
+
+.apply-now-text:hover {
+  animation-play-state: paused;
+  color: blue;
+}
+.apply-now-text img {
+  height: 30px; /* Adjust size of the GIF icons */
+  width: 30px;
+}
+@keyframes marqueeApply {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
 .section-title {
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "Arial", sans-serif;
   font-weight: bold;
-  margin: 0;
+  margin:0;
+ 
+
 }
 
 .notice-list img,
@@ -114,7 +162,6 @@
   max-height: 250px;
   border-radius: 10px;
 }
-
 @keyframes marquee {
   0% {
     transform: translateX(100%);
@@ -124,25 +171,19 @@
   }
 }
 
-.student,
-.notice {
-  text-decoration: none;
-}
-
 .section-icon {
-  width: 30px;
+  width: 30px; /* Adjust size of the icon */
   height: 30px;
   border-radius: 20px;
-  margin-right: 10px;
+  margin-right: 10px; /* Space between icon and text */
 }
-
 .mainhead {
-  background-color: lightblue;
-  padding: 20px 20px;
-  margin-bottom: 0px;
+  background-color:lightblue; /* Light grey background for the box */
+  padding: 20px 20px; /* Space inside the box */
+  margin-bottom: 0px ;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
-  text-align: center;
-  width: 100%;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: center; /* Center-align the text */
+  width: 100%; /* Full width of the parent */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Optional shadow for better appearance */
 }
