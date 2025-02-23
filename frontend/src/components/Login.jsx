@@ -76,6 +76,12 @@ const Login = () => {
                         >
                             Admin
                         </button>
+                        <button
+                            className={`role-btn ${role === 'content_admin' ? 'active' : ''}`}
+                            onClick={() => setRole('content_admin')}
+                        >
+                           Content Admin
+                        </button>
                     </div>
 
                     <form onSubmit={handleSubmit}>

@@ -13,7 +13,7 @@ const Courses = () => {
       .then((res) => res.json())
       .then((data) => setCourses(data))
       .catch((err) => console.error("Error fetching courses:", err));
-      window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   }, []);
 
   return (
@@ -41,14 +41,29 @@ const Courses = () => {
               <p><strong>Fee:</strong> ₹{course.fee}</p>
               <p><strong>Contact Details :</strong> {course.contact}</p>
               <p><strong>Requirements : </strong> {course.requirement}</p>
-              <Link to={`/courses/${course._id}`}>
-                <button className="explore-button">Explore</button>
-              </Link>
+
+              {/* 🔹 Show different buttons based on user role */}
+              {currentUser?.role === "student" && (
+                <Link to={`/courses/${course._id}`}>
+                  <button className="explore-button">Explore</button>
+                </Link>
+              )}
+
+              {currentUser?.role === "content_admin" && (
+                <div className="content-admin-buttons">
+                  <Link to={`/content-admin/add-form/${course._id}`}>
+                    <button className="admin-button">Add Application Form</button>
+                  </Link>
+                  <Link to={`/content-admin/add-description/${course._id}`}>
+                    <button className="admin-button">Add Description</button>
+                  </Link>
+                </div>
+              )}
             </div>
           ))}
       </div>
 
-      {/* Show "Add New Course" button only if user is an admin */}
+      {/* 🔹 Show "Add New Course" button only if user is an admin */}
       {currentUser?.role === "admin" && (
         <Link to="/add-course">
           <button className="add-course-button">Add New Course</button>

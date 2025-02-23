@@ -61,6 +61,7 @@
   padding-bottom: 5px;
   margin-bottom: 20px;
 }
+
 /* Button Styling */
 button {
   padding: 10px 15px;
@@ -77,6 +78,7 @@ button {
 button:hover {
   background-color: #45a049;
 }
+
 .complete-btn {
   margin-top: 10px;
   padding: 8px 15px;
@@ -111,20 +113,6 @@ button:hover {
   width: 100%;
 }
 
-.complete-btn {
-  margin-top: 15px;
-  background: green;
-  color: white;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.complete-btn:hover {
-  background: darkgreen;
-}
-
 /* Contact Information Form */
 .contact-information {
   display: flex;
@@ -143,20 +131,6 @@ button:hover {
   border: 1px solid #ccc;
   border-radius: 5px;
   width: 100%;
-}
-
-.complete-btn {
-  margin-top: 15px;
-  background: green;
-  color: white;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.complete-btn:hover {
-  background: darkgreen;
 }
 
 /* Academic Details */
@@ -222,6 +196,7 @@ button:hover {
   font-size: 14px;
   width: 100%;
 }
+
 /* Align labels to the left */
 .personal-details,
 .contact-information,
@@ -519,6 +494,7 @@ button:hover {
   transform: scale(1.2);
   cursor: pointer;
 }
+
 
 
 

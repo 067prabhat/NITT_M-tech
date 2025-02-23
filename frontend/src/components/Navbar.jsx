@@ -31,6 +31,8 @@ const Navbar = () => {
   const handleDashboardRedirect = () => {
     if (user?.role === "admin") {
       navigate("/Admindashboard");
+    } else if (user?.role === "content_admin") {
+      navigate("/contentAdmin"); // Redirect Content Admin
     } else if (user?.role === "student") {
       navigate("/dashboard");
     }
