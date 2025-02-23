@@ -124,10 +124,10 @@ app.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
     console.log("Generated JWT Token:", token); // ✅ Log the token
-    res.json({ token, userId: user._id, role: user.role });
+    return res.status(200).json({ token, userId: user._id, role: user.role,jwt_token:token });
   } catch (error) {
     console.error("Login error:", error); // Log error for debugging
-    res.status(500).json({ message: "Login error", error });
+   return res.status(500).json({ message: "Login error", error });
   }
 });
 

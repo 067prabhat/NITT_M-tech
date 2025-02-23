@@ -81,11 +81,16 @@ const ContentAdminForm = () => {
   const saveForm = async () => {
     try {
       console.log("working here")
-      await axios.post("/api/save-form-structure", {
-        courseId,
+      console.log(localStorage.getItem("token"));
+      
+      let data={ courseId,
         fields,
         educationFields,
-        sections,
+        sections,}
+      await axios.post("http://localhost:3001/api/forms/save-form-structure",data, {
+        headers:{
+          Authorization:localStorage.getItem("token")
+        }
       });
       alert("Form saved successfully!");
     } catch (error) {

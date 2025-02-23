@@ -3,7 +3,7 @@ require("dotenv").config();
 
 // Authentication Middleware
 const auth = (req, res, next) => {
-  const token = req.header("x-auth-token") || req.header("Authorization")?.split(" ")[1];
+  const token = req.header("authorization");
 
   if (!token) {
     return res.status(401).json({ message: "Access Denied: No Token Provided" });

@@ -8,7 +8,7 @@ const { body, validationResult } = require("express-validator");
 
 // ✅ Save or update form structure (Only Content Admin)
 router.post(
-  "api/save-form-structure", // Relative to /api/forms
+  "/save-form-structure", // Relative to /api/forms
   auth,
   authorize(["content_admin"]),
   [
@@ -21,6 +21,7 @@ router.post(
     try {
       // Validate request body
       const errors = validationResult(req);
+      console.log(errors)
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
