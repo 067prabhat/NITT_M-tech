@@ -6,6 +6,9 @@ import Login from "./Login";
 import Register from "./Register";
 import Courses from "./courses";
 import DataScience from "./DataScience";
+import ContentAdmin from "./ContentAdmin";
+import ContentAdminForm from "./contentAdminForm"; // New form component
+import ContentAdminDescription from "./ContentAdminDescription"; // New description component
 import Contact from "./Contact";
 import About from "./About";
 import NewCourse from "./NewCourse";
@@ -50,7 +53,11 @@ function App() {
           <Route path="/add-course" element={<NewCourse />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/Admindashboard" element={<AdminDashboard />} />
-          <Route path="/ApplicationForm" element={<ApplicationForm/>}></Route>
+          <Route path="/content-admin" element={<ContentAdmin />} />
+          <Route path="/ApplicationForm" element={<ApplicationForm />} />
+          {/* New Routes for Content Admin Actions */}
+          <Route path="/content-admin/add-form/:courseId" element={<ContentAdminForm />} />
+          <Route path="/content-admin/add-description/:courseId" element={<ContentAdminDescription />} />
         </Routes>
         <Footer />
       </>
@@ -59,3 +66,4 @@ function App() {
 }
 
 export default App;
+

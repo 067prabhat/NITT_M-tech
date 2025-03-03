@@ -3,7 +3,7 @@ require("dotenv").config();
 
 // Authentication Middleware
 const auth = (req, res, next) => {
-  const token = req.header("x-auth-token") || req.header("Authorization")?.split(" ")[1];
+  const token = req.header("authorization");
 
   if (!token) {
     return res.status(401).json({ message: "Access Denied: No Token Provided" });
@@ -11,6 +11,7 @@ const auth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded);
     req.user = decoded; // Attach user info to request
     next();
   } catch (error) {

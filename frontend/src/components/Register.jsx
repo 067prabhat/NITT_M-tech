@@ -7,9 +7,8 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student"); // Add state for role selection
   const [loading, setLoading] = useState(false);
-  const { setCurrentUser } = useAuth(); // Ensure this is used
+  const { setCurrentUser } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -21,7 +20,7 @@ const Register = () => {
         name,
         email,
         password,
-        role, // Include role in request data
+        role: "student", // Role is set to student by default
       });
 
       if (res.data === "Already registered") {
@@ -30,18 +29,15 @@ const Register = () => {
         return;
       }
 
-      // Extract userId and token
       const { userId, token } = res.data;
 
       if (!userId) {
         throw new Error("User ID is missing from the response");
       }
 
-      // Store userId and token
       localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
 
-      // Update auth context
       setCurrentUser(userId);
 
       setLoading(false);
@@ -54,11 +50,11 @@ const Register = () => {
   };
 
   return (
-    <div >
+    <div>
       <div
-        className="d-flex justify-content-center align-items-center text-center vh-100 "
+        className="d-flex justify-content-center align-items-center text-center vh-100"
         style={{
-           marginTop: "80px",
+          marginTop: "80px",
           background:
             "url('https://media.istockphoto.com/id/1365169514/video/learning-from-books-or-textbooks-and-the-internet-helps-create-new-ideas-slowly-moving.jpg?s=640x640&k=20&c=boT0zUPwwEHuIS-LXCbBdsx8D2KgtBLi_gNY2KR1bSA=') center/cover no-repeat, linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.3))",
         }}
@@ -107,23 +103,6 @@ const Register = () => {
                 onChange={(event) => setPassword(event.target.value)}
                 required
               />
-            </div>
-
-            {/* Dropdown to select the role (student/admin) */}
-            <div className="mb-3 text-start">
-              <label htmlFor="role" className="form-label">
-                <strong>Role</strong>
-              </label>
-              <select
-                id="role"
-                className="form-select"
-                value={role}
-                onChange={(event) => setRole(event.target.value)}
-                required
-              >
-                <option value="student">Student</option>
-                <option value="admin">Admin</option>
-              </select>
             </div>
 
             <button disabled={loading} type="submit" className="btn btn-primary">

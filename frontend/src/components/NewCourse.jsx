@@ -3,12 +3,22 @@ import { useNavigate } from "react-router-dom";
 import "./courses.css";
 
 const NewCourse = () => {
-  const [courseData, setCourseData] = useState({ title: "", description: "", details: "", duration: "", fee: "",requirement: "",contact: "" });
+  const [courseData, setCourseData] = useState({
+    title: "",
+    description: "",
+    details: "",
+    duration: "",
+    fee: "",
+    requirement: "",
+    contact: "",
+    contentAdminEmail: "",  // Content admin email field
+    contentAdminPassword: "" // Content admin password field
+  });
+
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get token from localStorage
     const token = localStorage.getItem("token");
     if (token) {
       try {
@@ -28,7 +38,7 @@ const NewCourse = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Check if user is an admin
+    // Ensure only admins can add courses
     if (!user || user.role !== "admin") {
       alert("Access Denied: Only admins can add courses.");
       return;
@@ -38,7 +48,7 @@ const NewCourse = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}` // Attach JWT Token
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(courseData),
     })
@@ -49,7 +59,7 @@ const NewCourse = () => {
         return res.json();
       })
       .then(() => {
-        alert("Course added successfully!");
+        alert("Course and content admin added successfully!");
         navigate("/");
       })
       .catch((err) => {
@@ -68,7 +78,13 @@ const NewCourse = () => {
         <input type="number" name="duration" placeholder="Duration (Years)" value={courseData.duration} onChange={handleChange} required />
         <input type="number" name="fee" placeholder="Fee (in Rupees)" value={courseData.fee} onChange={handleChange} required />
         <input type="text" name="requirement" placeholder="Requirements to get Admission" value={courseData.requirement} onChange={handleChange} required />
-        <input type="text" name="contact" placeholder="Contact details regarding Commitee" value={courseData.contact} onChange={handleChange} required />
+        <input type="text" name="contact" placeholder="Contact details regarding Committee" value={courseData.contact} onChange={handleChange} required />
+
+        {/* 🔹 Add fields for Content Admin */}
+        <h3>Assign Content Admin</h3>
+        <input type="email" name="contentAdminEmail" placeholder="Content Admin Email" value={courseData.contentAdminEmail} onChange={handleChange} required />
+        <input type="password" name="contentAdminPassword" placeholder="Content Admin Password" value={courseData.contentAdminPassword} onChange={handleChange} required />
+
         <button type="submit">Add Course</button>
       </form>
     </div>

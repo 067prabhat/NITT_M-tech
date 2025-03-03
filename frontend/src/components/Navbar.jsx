@@ -7,9 +7,8 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadUser = () => {
     const token = localStorage.getItem("token");
-
     if (token) {
       try {
         const decodedUser = jwtDecode(token);
@@ -19,7 +18,20 @@ const Navbar = () => {
         setUser(null);
         localStorage.removeItem("token");
       }
+    } else {
+      setUser(null);
     }
+  };
+
+  useEffect(() => {
+    loadUser(); // Load user when component mounts
+
+    // Listen for changes in localStorage (for real-time login/logout update)
+    window.addEventListener("storage", loadUser);
+
+    return () => {
+      window.removeEventListener("storage", loadUser);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -31,6 +43,8 @@ const Navbar = () => {
   const handleDashboardRedirect = () => {
     if (user?.role === "admin") {
       navigate("/Admindashboard");
+    } else if (user?.role === "content_admin") {
+      navigate("/contentAdmin");
     } else if (user?.role === "student") {
       navigate("/dashboard");
     }
