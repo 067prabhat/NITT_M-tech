@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useAuth } from "../context/authContext"; // Assuming you have this context for authentication
-import './Login.css'
+import './Login.css';
+
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("student"); // Default role is "student"
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { setCurrentUser } = useAuth(); // Use authentication context
@@ -17,32 +17,33 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post('http://localhost:3001/login', { email, password, role }); // Pass role to backend
+            const res = await axios.post('http://localhost:3001/login', { email, password });
 
             // Destructure token, userId, and role from the response
-            const { token, userId, role: userRole } = res.data;
+            const { token, userId, role } = res.data;
 
             if (token && userId) {
-                // Ensure the role from the backend matches the selected role
-                if (userRole !== role) {
-                    alert("Role mismatch. Please try logging in with the correct role.");
-                    return;
-                }
-
                 console.log("Login Successful");
 
                 // Store userId, token, and role in localStorage
                 localStorage.setItem("token", token);
                 localStorage.setItem("userId", userId);
-                localStorage.setItem("role", userRole);  // Store role in localStorage
+                localStorage.setItem("role", role);  
 
                 // Update auth context
-                setCurrentUser({ userId, userRole });
+                setCurrentUser({ userId, role });
 
-            
-                navigate('/home')
+                // Redirect based on role
+                if (role === "admin") {
+                    navigate('/home');
+                } else if (role === "content_admin") {
+                    navigate('/home');
+                } else {
+                    navigate('/home');
+                }
+
             } else {
-                alert('Incorrect password or email! Please try again.');
+                alert('Incorrect email or password! Please try again.');
             }
         } catch (err) {
             console.error("Login Error:", err);
@@ -61,28 +62,6 @@ const Login = () => {
                  }}>
                 <div className="bg-light p-3 rounded" style={{ width: '35%', marginLeft: '-35%' }}>
                     <h2 className="mb-3 text-primary">Login</h2>
-
-                    {/* Role Selection Buttons */}
-                    <div className="role-selection mb-3">
-                        <button
-                            className={`role-btn ${role === 'student' ? 'active' : ''}`}
-                            onClick={() => setRole('student')}
-                        >
-                            Student
-                        </button>
-                        <button
-                            className={`role-btn ${role === 'admin' ? 'active' : ''}`}
-                            onClick={() => setRole('admin')}
-                        >
-                            Admin
-                        </button>
-                        <button
-                            className={`role-btn ${role === 'content_admin' ? 'active' : ''}`}
-                            onClick={() => setRole('content_admin')}
-                        >
-                           Content Admin
-                        </button>
-                    </div>
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3 text-start">

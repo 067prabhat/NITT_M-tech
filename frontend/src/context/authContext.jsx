@@ -1,29 +1,38 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-// Create context
 const AuthContext = createContext();
 
-// AuthContext Provider Component
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
-  useEffect(() => {
-    // Check if the user is logged in by checking localStorage for token
+  // Function to load user from localStorage
+  const loadUser = () => {
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    const role = localStorage.getItem("role");
 
-    if (token) {
-      // Decode the token to get the user's information (including role)
-      const decodedUser = JSON.parse(atob(token.split(".")[1])); // Decode JWT token
-      setCurrentUser({
-        userId: decodedUser.userId,
-        role: decodedUser.role,  // Store the role along with userId
-      });
+    if (token && userId && role) {
+      setCurrentUser({ userId, role });
+    } else {
+      setCurrentUser(null);
     }
+  };
+
+  useEffect(() => {
+    loadUser(); // Load user when the component mounts
+
+    // Listen for changes in localStorage (for login/logout sync across tabs)
+    window.addEventListener("storage", loadUser);
+    
+    return () => {
+      window.removeEventListener("storage", loadUser);
+    };
   }, []);
 
   const logout = () => {
-    // Clear user data from localStorage and update the currentUser state
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("role");
     setCurrentUser(null);
   };
 
@@ -34,5 +43,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use AuthContext
 export const useAuth = () => useContext(AuthContext);

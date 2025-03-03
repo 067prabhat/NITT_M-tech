@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 const UserModel = require("./models/User");
 const CourseModel = require("./models/Course");
@@ -18,6 +19,15 @@ app.use(
     credentials: true
   })
 );
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 
 const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI, {
@@ -67,11 +77,10 @@ const authenticate = (req, res, next) => {
 };
 
 
-// User Registration with Password Hashing & JWT Token
 app.post("/register", async (req, res) => {
-  const { name, email, password, role } = req.body;
-  const allowedRoles = ["student", "admin", "content_admin"]; // Only allow these roles
-  const userRole = allowedRoles.includes(role) ? role : "student"; // Default to student if invalid role
+  const { name, email, password } = req.body; // No role input
+  const userRole = "student"; // Assign "student" role by default
+
   try {
     const user = await UserModel.findOne({ email });
     if (user) {
@@ -83,7 +92,7 @@ app.post("/register", async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: userRole,
+      role: userRole, // Always "student"
     });
 
     const token = jwt.sign(
@@ -92,6 +101,30 @@ app.post("/register", async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    // Send email notification
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Welcome to Our Platform!",
+      html: `
+        <h2>Hi ${name},</h2>
+        <p>Thank you for registering on our platform! 🎉</p>
+        <p>You can now log in using your registered email.</p>
+        <p><strong>Happy Learning! 🚀</strong></p>
+        <br>
+        <p>Best Regards,</p>
+        <p><strong>Your Team</strong></p>
+      `,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error("Error sending email:", err);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
     res.status(201).json({
       userId: newUser._id,
       token,
@@ -99,10 +132,12 @@ app.post("/register", async (req, res) => {
       message: `Registered successfully as ${newUser.role}`,
     });
   } catch (error) {
-    console.error(error); // Log error for debugging
+    console.error(error);
     res.status(500).json({ error: "Registration failed" });
   }
 });
+
+
 
 // User Login with Authentication
 app.post("/login", async (req, res) => {
@@ -133,10 +168,8 @@ app.post("/login", async (req, res) => {
 
 // Route: Admin Adds a Course
 app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
-  const { title, description, duration, fee, details, contact, requirement } = req.body;
-  console.log("Received course data:", req.body); // Debug log
+  const { title, description, duration, fee, details, contact, requirement, contentAdmins } = req.body;
 
-  // Validate that all required fields are provided
   if (!title || !description || !duration || !fee) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -150,21 +183,37 @@ app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
       details,
       contact,
       requirement,
+      contentAdmins, // Assign content admins when creating the course
     });
 
     await newCourse.save();
 
-    // Send back the generated course ID so Content Admin can use it
     res.status(201).json({
       message: "Course added successfully",
-      courseId: newCourse._id, // Return courseId
+      courseId: newCourse._id,
       course: newCourse,
     });
   } catch (error) {
-    console.error("Course creation error:", error); // Log error for debugging
     res.status(500).json({ message: "Error adding course", error: error.message });
   }
 });
+
+app.put("/api/courses/:courseId", authenticate, authorizeContentAdmin, async (req, res) => {
+  const { courseId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const course = await CourseModel.findByIdAndUpdate(courseId, updateData, { new: true });
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    res.status(200).json({ message: "Course updated successfully", course });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating course", error: error.message });
+  }
+});
+
 
 
 // Route: Fetch All Users (admin only)
