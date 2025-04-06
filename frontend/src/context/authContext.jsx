@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
+import { jwtDecode } from "jwt-decode";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -8,11 +8,23 @@ export const AuthProvider = ({ children }) => {
   // Function to load user from localStorage
   const loadUser = () => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-    const role = localStorage.getItem("role");
-
-    if (token && userId && role) {
-      setCurrentUser({ userId, role });
+  
+    if (token) {
+      try {
+        const decodedUser = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+  
+        if (decodedUser.exp < currentTime) {
+          logout();
+        } else {
+          const { userId, role } = decodedUser; // assuming these are in your token payload
+          setCurrentUser({ userId, role });
+        }
+  
+      } catch (error) {
+        console.error("Invalid token", error);
+        logout();
+      }
     } else {
       setCurrentUser(null);
     }
