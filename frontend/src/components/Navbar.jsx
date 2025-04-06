@@ -1,53 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../context/authContext"; // Adjust path accordingly
+import { FaUserCircle } from "react-icons/fa"; // Optional: for user icon
 import "./Navbar.css";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-
-  const loadUser = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedUser = jwtDecode(token);
-        setUser(decodedUser);
-      } catch (err) {
-        console.error("Token decoding failed:", err);
-        setUser(null);
-        localStorage.removeItem("token");
-      }
-    } else {
-      setUser(null);
-    }
-  };
-
-  useEffect(() => {
-    loadUser(); // Load user when component mounts
-
-    // Listen for changes in localStorage (for real-time login/logout update)
-    window.addEventListener("storage", loadUser);
-
-    return () => {
-      window.removeEventListener("storage", loadUser);
-    };
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/");
-  };
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleDashboardRedirect = () => {
-    if (user?.role === "admin") {
+    if (currentUser?.role === "admin") {
       navigate("/Admindashboard");
-    } else if (user?.role === "content_admin") {
+    } else if (currentUser?.role === "content_admin") {
       navigate("/contentAdmin");
-    } else if (user?.role === "student") {
+    } else if (currentUser?.role === "student") {
       navigate("/dashboard");
     }
+    setIsDropdownOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    setIsDropdownOpen(false);
+  };
+
+  const handleChangePassword = () => {
+    navigate("/change-password");
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -56,7 +37,7 @@ const Navbar = () => {
         <img src="/images/nitt.png" alt="NITT Logo" />
         NIT Trichy E-Campus
       </div>
-      
+
       <ul className="navbar-links">
         <li><Link to="/">Home</Link></li>
         <li><Link to="/courses">Courses</Link></li>
@@ -70,15 +51,24 @@ const Navbar = () => {
         <button>Search</button>
       </div>
 
-      {/* Dashboard & Logout Buttons in One Line */}
-      {user ? (
-        <div className="navbar-actions">
-          <button onClick={handleDashboardRedirect} className="dashboard-btn">
-            Dashboard
-          </button>
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
+      {currentUser ? (
+        <div className="navbar-user-menu">
+          {/* User icon */}
+          <div
+            className="user-icon"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            <FaUserCircle size={32} />
+          </div>
+
+          {/* Dropdown menu */}
+          {isDropdownOpen && (
+            <div className="dropdown-menu">
+              <button onClick={handleDashboardRedirect}>Dashboard</button>
+              <button onClick={handleChangePassword}>Change Password</button>
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          )}
         </div>
       ) : (
         <Link to="/login" className="login-link">Login</Link>

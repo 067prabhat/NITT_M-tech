@@ -6,13 +6,11 @@ const NewCourse = () => {
   const [courseData, setCourseData] = useState({
     title: "",
     description: "",
-    details: "",
-    duration: "",
-    fee: "",
-    requirement: "",
-    contact: "",
+    contentAdminName: "", 
     contentAdminEmail: "",  // Content admin email field
-    contentAdminPassword: "" // Content admin password field
+    //contentAdminPassword: "" // Content admin password field
+    counsellingOfficerName:"",
+    counsellingOfficerEmail:"",
   });
 
   const [user, setUser] = useState(null);
@@ -43,14 +41,23 @@ const NewCourse = () => {
       alert("Access Denied: Only admins can add courses.");
       return;
     }
+    
 
+    const requestBody = {
+      title: courseData.title,
+      description: courseData.description,
+      contentAdminName: courseData.contentAdminName,
+      contentAdminEmail: courseData.contentAdminEmail,
+      //contentAdminPassword: courseData.contentAdminPassword,
+    };
+    
     fetch("http://127.0.0.1:3001/api/newCourse", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
-      body: JSON.stringify(courseData),
+      body: JSON.stringify(requestBody),
     })
       .then((res) => {
         if (res.status === 401) throw new Error("Unauthorized. Please log in.");
@@ -74,17 +81,11 @@ const NewCourse = () => {
       <form onSubmit={handleSubmit}>
         <input type="text" name="title" placeholder="Title" value={courseData.title} onChange={handleChange} required />
         <input type="text" name="description" placeholder="Description" value={courseData.description} onChange={handleChange} required />
-        <textarea name="details" placeholder="Details" value={courseData.details} onChange={handleChange} required />
-        <input type="number" name="duration" placeholder="Duration (Years)" value={courseData.duration} onChange={handleChange} required />
-        <input type="number" name="fee" placeholder="Fee (in Rupees)" value={courseData.fee} onChange={handleChange} required />
-        <input type="text" name="requirement" placeholder="Requirements to get Admission" value={courseData.requirement} onChange={handleChange} required />
-        <input type="text" name="contact" placeholder="Contact details regarding Committee" value={courseData.contact} onChange={handleChange} required />
 
         {/* 🔹 Add fields for Content Admin */}
         <h3>Assign Content Admin</h3>
+        <input type="text" name="contentAdminName" placeholder="Content Admin Name" value={courseData.contentAdminName} onChange={handleChange} required />
         <input type="email" name="contentAdminEmail" placeholder="Content Admin Email" value={courseData.contentAdminEmail} onChange={handleChange} required />
-        <input type="password" name="contentAdminPassword" placeholder="Content Admin Password" value={courseData.contentAdminPassword} onChange={handleChange} required />
-
         <button type="submit">Add Course</button>
       </form>
     </div>

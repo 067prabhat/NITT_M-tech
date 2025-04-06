@@ -7,19 +7,22 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 const UserModel = require("./models/User");
 const CourseModel = require("./models/Course");
+const {body , validationResult} = require("express-validator");
 const ApplicationForm = require("./models/ApplicationForm");
 const FormModel = require("./models/Form"); 
 const formRoutes = require("./routes/formRoutes");
+const noticeRoutes = require("./routes/noticeRoutes");
 const app = express();
-app.use(express.json());
+app.use(express.json({limit: " 10mb"}));
+app.use(express.urlencoded({limit : "10mb" , extended: true}));
 app.use(
   cors({
     origin: "http://localhost:5173",  // Allow frontend access
-    methods: "GET,POST,PUT,DELETE",
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
     credentials: true
   })
 );
-
+app.options("*", cors());
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -35,8 +38,11 @@ mongoose.connect(MONGO_URI, {
   useUnifiedTopology: true,
 });
 app.use("/api/forms", formRoutes);  // Register form routes
+
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
+
+app.use("/api/notices", noticeRoutes);
 // Middleware for admin authorization
 const authorizeAdmin = (req, res, next) => {
   console.log("User role:", req.user.role);  // Log the user role for debugging
@@ -167,31 +173,62 @@ app.post("/login", async (req, res) => {
 });
 
 // Route: Admin Adds a Course
-app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
-  const { title, description, duration, fee, details, contact, requirement, contentAdmins } = req.body;
 
-  if (!title || !description || !duration || !fee) {
+const generateRandomPassword = () => {
+  return Math.random().toString(36).slice(-8); // Generates an 8-character password
+};
+
+app.post("/api/newCourse", authenticate, authorizeAdmin, async (req, res) => {
+  const { title, description, contentAdminName,contentAdminEmail} = req.body;
+
+  if (!title || !description|| !contentAdminName|| !contentAdminEmail  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
-
+  
   try {
+
+    let contentAdmin = await UserModel.findOne({ email:contentAdminEmail });
+    
+    const generatedPassword = generateRandomPassword();
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+    
+    if (!contentAdmin) {
+      
+      contentAdmin = new UserModel({
+        name:contentAdminName,
+        email:contentAdminEmail,
+        password: hashedPassword,
+        role: "content_admin",
+      });
+      await contentAdmin.save();
+    }
+
     const newCourse = new CourseModel({
       title,
       description,
-      duration,
-      fee,
-      details,
-      contact,
-      requirement,
-      contentAdmins, // Assign content admins when creating the course
+      contentAdmins:[contentAdmin._id], // Assign content admins when creating the course
     });
 
     await newCourse.save();
+    
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: contentAdminEmail,
+      subject: "Your Content Admin Credentials",
+      text: `Hello ,${contentAdminName}\n\nYou have been assigned as the content admin for the course: "${title}".\n\nYour login credentials:\nEmail: ${contentAdminEmail}\nPassword: ${generatedPassword}\n\nPlease change your password after logging in.\n\nBest Regards,\nAdmin Team`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email", error });
+      }
+      console.log("Email sent:", info.response);
+    });
 
     res.status(201).json({
       message: "Course added successfully",
-      courseId: newCourse._id,
-      course: newCourse,
+      newCourse
     });
   } catch (error) {
     res.status(500).json({ message: "Error adding course", error: error.message });
@@ -319,6 +356,62 @@ app.get("/api/application/:id", authenticate, async (req, res) => {
 });
 
 
+app.post("/api/courses/:courseId/add-description", authenticate, authorizeContentAdmin, async (req, res) => {
+  const { courseId } = req.params;
+  const {
+    programDescription,
+    image1,
+    image2,
+    vision,
+    mission,
+    yearsOfDepartment,
+    syllabus,
+    programEducationalObjectives,
+    programOutcomes,
+  } = req.body;
+  console.log("Received data:", req.body); // Log the received data
+  // Validate required fields
+  if (
+    !programDescription ||
+    !image1 ||
+    !image2 ||
+    !vision ||
+    !mission ||
+    !yearsOfDepartment ||
+    !syllabus ||
+    !programEducationalObjectives ||
+    !programOutcomes
+  ) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    // Find the course by ID
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Update the course with the new description
+    course.programDescription = programDescription;
+    course.image1 = image1;
+    course.image2 = image2;
+    course.vision = vision;
+    course.mission = mission;
+    course.yearsOfDepartment = yearsOfDepartment;
+    course.syllabus = syllabus;
+    course.programEducationalObjectives = programEducationalObjectives;
+    course.programOutcomes = programOutcomes;
+    console.log("Updated course:", course);  //Log the updated course
+    await course.save();
+
+    res.status(200).json({ message: "Course description added successfully!", course });
+  } catch (error) {
+    console.error("Error adding course description:", error);
+    res.status(500).json({ message: "Error adding course description", error: error.message });
+  }
+});
+
 // Route: Delete Application (Admin Only)
 app.delete("/api/application/:id", authenticate, authorizeAdmin, async (req, res) => {
   const { id } = req.params;
@@ -357,6 +450,52 @@ app.post("/api/forms/create", authenticate, async (req, res) => {
   } catch (error) {
     console.error("Error creating form:", error);
     res.status(500).json({ message: "Error creating form", error: error.message });
+  }
+});
+
+
+// Change Password Route
+app.put("/change-password",authenticate, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+    // Validate input fields
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({ message: "New passwords do not match." });
+    }
+
+    const userId = req.user.userId; // Retrieved from JWT by authenticate middleware
+
+    // Find user by ID
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Compare current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect." });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password in DB
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password changed successfully!" });
+
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Something went wrong. Try again later." });
   }
 });
 
